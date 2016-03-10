@@ -6,9 +6,9 @@ package com.mt.sniffer.runner;
 import java.io.File;
 import java.util.concurrent.Callable;
 
-import com.mt.sniffer.feeders.SharedCache;
 import com.mt.sniffer.file.handler.FileHandler;
-import com.mt.sniffer.signal.InterruptSignal;
+import com.mt.sniffer.file.handler.PoisonPill;
+
 
 /**
  * @author mohitkumar
@@ -16,12 +16,12 @@ import com.mt.sniffer.signal.InterruptSignal;
  */
 public class Sniffer implements Callable<String> {
 	
-	private SharedCache cache;
+	private FileBlockingQueue queue;
 	
 	private String token;
 	
-	public Sniffer(SharedCache cache,String token) {
-		this.cache=cache;
+	public Sniffer(FileBlockingQueue queue,String token) {
+		this.queue=queue;
 		this.token=token;
 	}
 
@@ -29,16 +29,37 @@ public class Sniffer implements Callable<String> {
 	public String call() throws Exception {
 		while(true){
 			//System.out.println(queue.toString());
-			File file=cache.fileCache().getFile();
+			File file=queue.getFile();
 			if(file!=null){
 				//System.out.println(Thread.currentThread().getName()+"sniffing for "+file.getAbsolutePath());
-				
+				if(file instanceof PoisonPill){
+					PoisonPill pill= (PoisonPill)file;
+					if(pill.getPillId()==Thread.currentThread().getId()){
+						break;
+					}else{
+						continue;
+					}
+				}
+				if(file.isDirectory()){
+				File[] files =	file.listFiles();
+				for(File f:files){
+					if(!(f.getName().startsWith(".")) && (f.getName().endsWith(".java") || f.isDirectory())){
+						queue.add(f);	
+					}
+					
+				}
+				}else{
 					FileHandler handler = new FileHandler();
 					handler.searchInFile(file, token);
-							}
-			if(InterruptSignal.getInstance().interrupt.get()){
-				break;
+				}
+			}else{
+				PoisonPill pill = new PoisonPill("");
+				pill.setPillId(Thread.currentThread().getId());
+				queue.add(pill);
 			}
+			/*if(InterruptSignal.getInstance().interrupt.get()){
+				break;
+			}*/
 			//return "";
 		}
 		System.out.println(Thread.currentThread().getName()+" exiting");

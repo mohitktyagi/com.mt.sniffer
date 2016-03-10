@@ -9,7 +9,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
-import com.mt.sniffer.signal.InterruptSignal;
+
 
 /**
  * @author mohitkumar
@@ -25,7 +25,7 @@ public class FileHandler {
 			while(scanner.hasNext()){
 				if(scanner.nextLine().contains(token)){
 					System.out.println(Thread.currentThread().getName()+" : found in file "+file.getAbsolutePath());
-					InterruptSignal.getInstance().interrupt.set(true);
+					
 					return file.getAbsolutePath();
 				}
 			}

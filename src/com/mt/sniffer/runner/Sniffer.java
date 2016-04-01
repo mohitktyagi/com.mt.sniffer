@@ -28,10 +28,10 @@ public class Sniffer implements Callable<String> {
 	@Override
 	public String call() throws Exception {
 		while(true){
-			//System.out.println(queue.toString());
+			
 			File file=queue.getFile();
 			if(file!=null){
-				//System.out.println(Thread.currentThread().getName()+"sniffing for "+file.getAbsolutePath());
+				
 				if(file instanceof PoisonPill){
 					PoisonPill pill= (PoisonPill)file;
 					if(pill.getPillId()==Thread.currentThread().getId()){
@@ -43,9 +43,9 @@ public class Sniffer implements Callable<String> {
 				if(file.isDirectory()){
 				File[] files =	file.listFiles();
 				for(File f:files){
-					if(!(f.getName().startsWith(".")) && (f.getName().endsWith(".java") || f.isDirectory())){
+					
 						queue.add(f);	
-					}
+					
 					
 				}
 				}else{
@@ -57,10 +57,7 @@ public class Sniffer implements Callable<String> {
 				pill.setPillId(Thread.currentThread().getId());
 				queue.add(pill);
 			}
-			/*if(InterruptSignal.getInstance().interrupt.get()){
-				break;
-			}*/
-			//return "";
+			
 		}
 		System.out.println(Thread.currentThread().getName()+" exiting");
 		return "";

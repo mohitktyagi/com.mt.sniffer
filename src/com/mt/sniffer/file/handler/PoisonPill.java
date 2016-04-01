@@ -4,7 +4,6 @@
 package com.mt.sniffer.file.handler;
 
 import java.io.File;
-import java.util.UUID;
 
 /**
  * @author mohitkumar
@@ -12,6 +11,11 @@ import java.util.UUID;
  */
 public class PoisonPill extends File {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 787142786185944446L;
+
 	private final boolean isPill=true;
 	
 	private long pillId;

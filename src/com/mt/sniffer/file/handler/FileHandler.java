@@ -17,23 +17,27 @@ import java.util.Scanner;
 public class FileHandler {
 	
 	public String searchInFile(File file,String token){
+		Scanner scanner=null;
 		try {
-			//System.out.println("Searching in file "+file.getName());
+			
 			FileInputStream fis= new FileInputStream(file);
-			Scanner scanner = new Scanner(fis);
-			while(scanner.hasNext()){
-				if(scanner.nextLine().contains(token)){
-					System.out.println(Thread.currentThread().getName()+" : found in file "+file.getAbsolutePath());
-					
-					return file.getAbsolutePath();
-				}
+			 scanner = new Scanner(fis);
+			String str= scanner.findWithinHorizon(token, 0);
+			if(str != null){
+				System.out.println(Thread.currentThread().getName()+" : found in file "+file.getAbsolutePath());
 			}
+			 
+			
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		
 		}catch(Exception e){
 			e.printStackTrace();
+		}finally{
+			scanner.close();
 		}
+		
 		return "";
 	}
 

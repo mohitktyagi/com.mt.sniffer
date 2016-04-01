@@ -38,7 +38,7 @@ public class SearchControler {
 		e.printStackTrace();
 	}
 	long endTime =System.currentTimeMillis();
-	System.out.println("exiting main , total time took "+(endTime-startTime));
+	System.out.println("exiting main , total time took "+(endTime-startTime)+" milli Seconds");
 	
 	
 	

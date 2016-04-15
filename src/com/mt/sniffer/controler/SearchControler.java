@@ -17,7 +17,7 @@ import com.mt.sniffer.runner.Sniffer;
  */
 public class SearchControler {
  public static void main(String[] args) {
-	ExecutorService executorService = Executors.newFixedThreadPool(10);
+	ExecutorService executorService = Executors.newFixedThreadPool(6);
 	String token=args[0];
 	if(token == null || token.equals("")){
 		System.out.println("Please pass toekn to search!");

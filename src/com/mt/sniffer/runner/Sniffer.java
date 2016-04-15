@@ -35,8 +35,16 @@ public class Sniffer implements Callable<String> {
 				if(file instanceof PoisonPill){
 					PoisonPill pill= (PoisonPill)file;
 					if(pill.getPillId()==Thread.currentThread().getId()){
-						break;
+						if(pill.getMarkCount()<=3){
+							pill.setMarkCount(pill.getMarkCount()+1);
+							queue.add(file);
+							continue;
+						}else{
+							break;
+						}
+						
 					}else{
+						queue.add(file);
 						continue;
 					}
 				}

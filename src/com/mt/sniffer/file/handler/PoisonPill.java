@@ -19,6 +19,8 @@ public class PoisonPill extends File {
 	private final boolean isPill=true;
 	
 	private long pillId;
+	
+	private int markCount;
 
 	public PoisonPill(String pathname) {
 		super(pathname);
@@ -36,6 +38,14 @@ public class PoisonPill extends File {
 
 	public final boolean isPill() {
 		return isPill;
+	}
+
+	public final int getMarkCount() {
+		return markCount;
+	}
+
+	public final void setMarkCount(int markCount) {
+		this.markCount = markCount;
 	}
 
 	

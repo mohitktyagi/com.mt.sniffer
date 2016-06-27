@@ -4,30 +4,30 @@
 package com.mt.sniffer.runner;
 
 import java.io.File;
+import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author mohitkumar
  *
  */
 public class FileBlockingQueue {
-	private BlockingQueue<File> queue;
-	
+	private Queue<File> queue;
+	public AtomicInteger fileCount = new AtomicInteger();
 	public FileBlockingQueue() {
-		queue = new LinkedBlockingQueue<File>(4023);
+		queue = new ConcurrentLinkedQueue<>();
 	}
 	
 	public  void  add(File file){
-		try {
+		//fileCount.incrementAndGet();
 			//System.out.println(Thread.currentThread().getName()+"Adding "+file.getAbsolutePath());
-			queue.put(file);
+			queue.offer(file);
 			
 			//System.out.println(Thread.currentThread().getName()+"queue size"+queue.size());
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		
 	}
 	
 	public  File getFile(){

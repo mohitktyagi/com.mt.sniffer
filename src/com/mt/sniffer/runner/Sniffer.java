@@ -16,13 +16,18 @@ import com.mt.sniffer.file.handler.PoisonPill;
  */
 public class Sniffer implements Callable<String> {
 	
-	private FileBlockingQueue queue;
+	private final FileBlockingQueue queue;
+	
+	private FileHandler handler = new FileHandler();
+	
+	private TokenLocationList locationList ;
 	
 	private String token;
 	
-	public Sniffer(FileBlockingQueue queue,String token) {
+	public Sniffer(FileBlockingQueue queue,String token , TokenLocationList list) {
 		this.queue=queue;
 		this.token=token;
+		this.locationList = list;
 	}
 
 	@Override
@@ -44,8 +49,11 @@ public class Sniffer implements Callable<String> {
 						}
 						
 					}else{
-						queue.add(file);
-						continue;
+						if(!file.isHidden()){
+							queue.add(file);
+							continue;
+						}
+						
 					}
 				}
 				if(file.isDirectory()){
@@ -57,8 +65,8 @@ public class Sniffer implements Callable<String> {
 					
 				}
 				}else{
-					FileHandler handler = new FileHandler();
-					handler.searchInFile(file, token);
+					
+					handler.searchInFile(file, token,locationList);
 				}
 			}else{
 				PoisonPill pill = new PoisonPill("");
@@ -67,7 +75,7 @@ public class Sniffer implements Callable<String> {
 			}
 			
 		}
-		System.out.println(Thread.currentThread().getName()+" exiting");
+		
 		return "";
 	}
 

@@ -8,6 +8,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
+import com.mt.sniffer.runner.TokenLocationList;
+
 
 
 /**
@@ -16,7 +18,7 @@ import java.util.Scanner;
  */
 public class FileHandler {
 	
-	public String searchInFile(File file,String token){
+	public String searchInFile(File file,String token,TokenLocationList list){
 		Scanner scanner=null;
 		try {
 			
@@ -24,7 +26,8 @@ public class FileHandler {
 			 scanner = new Scanner(fis);
 			String str= scanner.findWithinHorizon(token, 0);
 			if(str != null){
-				System.out.println(Thread.currentThread().getName()+" : found in file "+file.getAbsolutePath());
+				//System.out.println(file.getAbsolutePath());
+				list.add(new TokenLocation(file.getName() ,token,file.getAbsolutePath()));
 			}
 			 
 			

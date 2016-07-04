@@ -4,6 +4,7 @@
 package com.mt.sniffer.ui;
 
 import java.io.File;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -133,15 +134,36 @@ public class SnifferFrame extends javax.swing.JFrame {
     } 
 
     private void searchjButton2ActionPerformed(java.awt.event.ActionEvent evt) {
+    	if(this.searchInProgress.get()){
+    		JOptionPane.showMessageDialog(null, "Search in progress. Close window to exit.", "Error", JOptionPane.ERROR_MESSAGE);
+    		return;
+    	}
+    	this.searchInProgress.set(true);
+    	Thread tr=new Thread( new Runnable() {
+			
+			@Override
+			public void run() {
+				SnifferFrame.this.searchHandler();
+				
+			}
+		});
+    	tr.start();
+    	
+    } 
+    
+    
+    private void searchHandler(){
     	this.resultjTextArea1.setText(null);
     	String token = this.tokenjTextField1.getText();
     	String dir = this.dirjTextField2.getText();
     	if(token == null || token.equals("")){
     		JOptionPane.showMessageDialog(null, "Toekn to be searched , must not be empty.", "Error", JOptionPane.ERROR_MESSAGE);
+    		SnifferFrame.this.searchInProgress.set(false);
     		return;
     	}
     	if(dir == null || dir.equals("")){
     		JOptionPane.showMessageDialog(null, "Directory  to be searched in , must not be empty.", "Error", JOptionPane.ERROR_MESSAGE);
+    		SnifferFrame.this.searchInProgress.set(false);
     		return;
     		
     	}else{
@@ -149,6 +171,7 @@ public class SnifferFrame extends javax.swing.JFrame {
     		File file = new File(dir);
     		if(!file.exists()){
     			JOptionPane.showMessageDialog(null, "Directory  doesn't exist.", "Error", JOptionPane.ERROR_MESSAGE);
+    			SnifferFrame.this.searchInProgress.set(false);
     			return;
     		}
     	}
@@ -171,7 +194,8 @@ public class SnifferFrame extends javax.swing.JFrame {
     	 long endTime = System.currentTimeMillis();
     		double totalTimeInSec = (endTime-startTime)/1000.00;
     		System.out.println("Total time took "+totalTimeInSec +" Second(s)");
-    } 
+    		SnifferFrame.this.searchInProgress.set(false);
+    }
 
     /**
      * @param args the command line arguments
@@ -217,5 +241,6 @@ public class SnifferFrame extends javax.swing.JFrame {
     private javax.swing.JButton searchjButton2;
     private javax.swing.JLabel tokenjLabel1;
     private javax.swing.JTextField tokenjTextField1;
+    private AtomicBoolean searchInProgress = new AtomicBoolean();
     // End of variables declaration                   
 }

@@ -29,29 +29,48 @@ public class SearchControler {
 	long endTime = System.currentTimeMillis();
 	double totalTimeInSec = (endTime-startTime)/1000.00;
 	System.out.println("Total time took "+totalTimeInSec +" Second(s)");
-	
 }
  
  private static void commandLineSearch(String[] args){
 	 verifyInput(args);
-	 search(args[1], args[0]);
+	 ResultSet resultSet = search(args[1], args[0]);
+	 if(resultSet.hasNext()){
+			TokenLocation tlok=null;
+			while(resultSet.hasNext()){
+				tlok = resultSet.next();
+				System.out.println(tlok.getFilePath());
+			}
+			
+		}else{
+			System.out.println("Given token : "+args[0]+" not found in "+args[1]);
+		}
  }
  
- private static void search(String dir ,String token){
-	verifyInput(dir,token);
-	ExecutorService executorService = Executors.newFixedThreadPool(6);
+ public static ResultSet search(String dir ,String token){
+	ThreadAttribute.clearValues();
+	ExecutorService executorService = Executors.newFixedThreadPool(5);
 	
 	
 	File file = new File(dir);
 	FileBlockingQueue blockingQueue = new FileBlockingQueue();
-	blockingQueue.add(file);
+	
+	if(file.isDirectory()){
+		File[] files =	file.listFiles();
+		for(File f:files){
+			
+			blockingQueue.add(f);	
+						
+		}
+		}else{
+			blockingQueue.add(file);
+		}
 	
 	
 	List<TokenLocationList> locLists = new ArrayList<TokenLocationList>();
 	TokenLocationList  lst;
 	List<Callable<String>> sniffers = new ArrayList<Callable<String>>();
 	
-	for(int i=0;i<6;i++){
+	for(int i=0;i<5;i++){
 		lst = new TokenLocationList();
 		locLists.add(lst);
 		sniffers.add(new Sniffer(blockingQueue, token,lst));
@@ -69,16 +88,9 @@ public class SearchControler {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
 	}
-	if(resultSet.hasNext()){
-		TokenLocation tlok=null;
-		while(resultSet.hasNext()){
-			tlok = resultSet.next();
-			System.out.println(tlok.getFilePath());
-		}
-		
-	}else{
-		System.out.println("Given token : "+token+" not found in "+dir);
-	}
+	
+	return resultSet;
+	
 	//System.err.println("file scanned "+blockingQueue.fileCount.get());
 	//long endTime =System.currentTimeMillis();
 	//System.out.println("exiting main , total time took "+(endTime-startTime)+" milli Seconds");
@@ -89,7 +101,8 @@ public class SearchControler {
 	 for(Future<String> f : fList){
 		 try {
 			f.get();
-		} catch (InterruptedException e) {
+		}
+		 catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ExecutionException e) {

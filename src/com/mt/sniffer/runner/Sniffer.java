@@ -6,6 +6,7 @@ package com.mt.sniffer.runner;
 import java.io.File;
 import java.util.concurrent.Callable;
 
+import com.mt.sniffer.controler.ThreadAttribute;
 import com.mt.sniffer.file.handler.FileHandler;
 import com.mt.sniffer.file.handler.PoisonPill;
 
@@ -40,22 +41,33 @@ public class Sniffer implements Callable<String> {
 				if(file instanceof PoisonPill){
 					PoisonPill pill= (PoisonPill)file;
 					if(pill.getPillId()==Thread.currentThread().getId()){
-						if(pill.getMarkCount()<=3){
-							pill.setMarkCount(pill.getMarkCount()+1);
-							queue.add(file);
-							continue;
+						Boolean isLastPoisonPill = ThreadAttribute.getValue(ThreadAttribute.IS_LAST_PIOSON_PILL);
+						if(isLastPoisonPill !=null || isLastPoisonPill){
+							if(pill.getMarkCount()<=3){
+								pill.setMarkCount(pill.getMarkCount()+1);
+								queue.add(file);
+								ThreadAttribute.setValue(ThreadAttribute.IS_LAST_PIOSON_PILL, true);
+								continue;
+							}else{
+								break;
+							}
 						}else{
-							break;
+							pill.setMarkCount(1);
+							queue.add(file);
+							ThreadAttribute.setValue(ThreadAttribute.IS_LAST_PIOSON_PILL, true);
+							continue;
 						}
 						
+						
 					}else{
-						if(!file.isHidden()){
+						
 							queue.add(file);
 							continue;
-						}
+						
 						
 					}
 				}
+				ThreadAttribute.setValue(ThreadAttribute.IS_LAST_PIOSON_PILL, false);
 				if(file.isDirectory()){
 				File[] files =	file.listFiles();
 				for(File f:files){
@@ -69,13 +81,19 @@ public class Sniffer implements Callable<String> {
 					handler.searchInFile(file, token,locationList);
 				}
 			}else{
-				PoisonPill pill = new PoisonPill("");
-				pill.setPillId(Thread.currentThread().getId());
-				queue.add(pill);
+				Boolean isLastPoisonPill = ThreadAttribute.getValue(ThreadAttribute.POISON_PILL_PUSH);
+				if(isLastPoisonPill == null || !isLastPoisonPill){
+					PoisonPill pill = new PoisonPill("");
+					pill.setPillId(Thread.currentThread().getId());
+					queue.add(pill);
+					ThreadAttribute.setValue(ThreadAttribute.POISON_PILL_PUSH, true);
+					ThreadAttribute.setValue(ThreadAttribute.IS_LAST_PIOSON_PILL, true);
+				}
+				
 			}
 			
 		}
-		
+		//System.out.println("exting thread "+Thread.currentThread().getName());
 		return "";
 	}
 
